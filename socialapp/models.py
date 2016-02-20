@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from django.contrib.auth.models import User
 from django.db.models.signals import post_save
-from django.contrib.auth.models import User
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User, AbstractUser
 
 class Category(models.Model):
 	name = models.CharField(max_length=200)
@@ -37,13 +35,10 @@ class UserProfile(AbstractUser):
 	location = models.CharField(max_length=100)
 
 	def __str__(self):
-		return "{} {}".format(self.first_name, self.last_name)
-
-def create_user_profile(sender, instance, created, **kwargs):  
-	if created:  
-		profile, created = UserProfile.objects.get_or_create(user=instance)  
-
-post_save.connect(create_user_profile, sender=User) 
+		if self.first_name:
+			return "{} {}".format(self.first_name, self.last_name)
+		else:
+			return self.last_name
 
 class Post(models.Model):
 	title = models.CharField(max_length=100)
@@ -51,9 +46,9 @@ class Post(models.Model):
 	image = models.ImageField(blank=True)
 	date = models.DateTimeField()
 	organisation = models.ForeignKey(
-		Organisation, related_name='posts')
-	user = models.ForeignKey(UserProfile)
-	location = models.CharField(max_length=100)
+		Organisation, related_name='posts', blank=True)
+	user = models.ForeignKey(UserProfile, blank=True)
+	location = models.CharField(max_length=100, blank=True)
 
 	def __str__(self):
 		return self.title
