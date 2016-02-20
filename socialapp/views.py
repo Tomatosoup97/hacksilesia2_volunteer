@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+import django_filters
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import viewsets
-
+from rest_framework import filters
 from socialapp.models import UserProfile, Category, Organisation, Post, Order
 from socialapp.serializers import UserProfileSerializer, OrganisationSerializer
 from socialapp.serializers import CategorySerializer, PostSerializer, OrderSerializer
@@ -17,12 +18,30 @@ class PostList(mixins.ListModelMixin,
 				  generics.GenericAPIView):
 	queryset = Post.objects.all()
 	serializer_class = PostSerializer
+	filter_backends = (filters.SearchFilter,)
+	search_fields = ('title', 'location')
 
 	def get(self, request, *args, **kwargs):
 		return self.list(request, *args, **kwargs)
 
 	def post(self, request, *args, **kwargs):
 		return self.create(request, *args, **kwargs)
+
+class UserOrders(mixins.ListModelMixin,
+				  mixins.CreateModelMixin,
+				  generics.GenericAPIView):
+	
+	def get(self, request, *args, **kwargs):
+		user = self.request.user
+		return Order.objects.filter(user=user)
+
+class UserPosts(mixins.ListModelMixin,
+				  mixins.CreateModelMixin,
+				  generics.GenericAPIView):
+	
+	def get(self, request, *args, **kwargs):
+		user = self.request.user
+		return Post.objects.filter(user=user)
 
 class PostDetail(mixins.RetrieveModelMixin,
 					mixins.UpdateModelMixin,
@@ -75,6 +94,8 @@ class OrganisationList(mixins.ListModelMixin,
 				  generics.GenericAPIView):
 	queryset = Organisation.objects.all()
 	serializer_class = OrganisationSerializer
+	filter_backends = (filters.SearchFilter,)
+	search_fields = ('name', 'location')
 
 	def get(self, request, *args, **kwargs):
 		return self.list(request, *args, **kwargs)
@@ -104,6 +125,8 @@ class UserProfileList(mixins.ListModelMixin,
 				  generics.GenericAPIView):
 	queryset = UserProfile.objects.all()
 	serializer_class = UserProfileSerializer
+	filter_backends = (filters.SearchFilter,)
+	search_fields = ('first_name', 'last_name', 'location')
 
 	def get(self, request, *args, **kwargs):
 		return self.list(request, *args, **kwargs)
@@ -156,20 +179,3 @@ class OrderDetail(mixins.RetrieveModelMixin,
 
 	def delete(self, request, *args, **kwargs):
 		return self.destroy(request, *args, **kwargs)
-
-
-# class UserViewSet(viewsets.ModelViewSet):
-# 	queryset = UserProfile.objects.all()
-# 	serializer_class = UserProfileSerializer
-
-# class PostViewSet(viewsets.ModelViewSet):
-# 	queryset = Post.objects.all()
-# 	serializer_class = PostSerializer
-
-# class CategoryViewSet(viewsets.ModelViewSet):
-# 	queryset = Category.objects.all()
-# 	serializer_class = CategorySerializer
-
-# class OrganisationViewSet(viewsets.ModelViewSet):
-# 	queryset = Organisation.objects.all()
-# 	serializer_class = OrganisationSerializer

@@ -6,14 +6,12 @@ from rest_framework import routers, serializers, viewsets
 from socialapp.models import Organisation, Post, Order
 from socialapp.models import Category, UserProfile
 from socialapp import views 
-	
+
 router = routers.DefaultRouter()
-# router.register(r'users', views.UserViewSet)
-# router.register(r'post', views.PostViewSet)
-# router.register(r'category', views.CategoryViewSet)
-# router.register(r'organisation', views.OrganisationViewSet)
 
 urlpatterns = [
+    url(r'^user_posts/$', views.UserPosts.as_view()),
+    url(r'^user_orders/$', views.UserPosts.as_view()),
     url(r'^post/$', views.PostList.as_view()),
     url(r'^post/(?P<pk>[0-9]+)$', views.PostDetail.as_view()),
     url(r'^category/$', views.CategoryList.as_view()),

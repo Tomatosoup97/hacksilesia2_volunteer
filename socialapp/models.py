@@ -3,12 +3,12 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
-from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AbstractUser
 
 class Category(models.Model):
 	name = models.CharField(max_length=200)
 	icon = models.ImageField(blank=True)
+	icon2 = models.ImageField(blank=True)
 
 	def __str__(self):
 		return self.name
@@ -34,6 +34,7 @@ class UserProfile(AbstractUser):
 	about = models.TextField()
 	avatar = models.ImageField(blank=True)
 	orders = models.ManyToManyField(Order, blank=True)
+	location = models.CharField(max_length=100)
 
 	def __str__(self):
 		return "{} {}".format(self.first_name, self.last_name)
@@ -49,8 +50,10 @@ class Post(models.Model):
 	content = models.TextField()
 	image = models.ImageField(blank=True)
 	date = models.DateTimeField()
-	organisation = models.ForeignKey(Organisation)
+	organisation = models.ForeignKey(
+		Organisation, related_name='posts')
 	user = models.ForeignKey(UserProfile)
+	location = models.CharField(max_length=100)
 
 	def __str__(self):
 		return self.title
